@@ -1,0 +1,86 @@
+---
+title: "Apriori Analysis for TCM"
+author: "Xianying, Tan"
+date: "2016年3月2日"
+output: html_document
+---
+
+## The packages that are needed 
+_(You'll not be able to exec the script without installing the following packages)_
+
+### For data mungling:
+- dplyr
+- ggplot2
+- readr
+- purrr
+- stringr # character manipulation
+- showtext # show Chinese in the plot
+
+### For data mining:
+- arules
+- arulesViz
+
+
+## Setting up the environment
+
+```{r setting, echo=TRUE, message=FALSE, warning=FALSE}
+showtext::showtext.auto()
+library(dplyr)
+library(ggplot2)
+library(arules)
+library(arulesViz)
+```
+
+## Reference
+
+- [R语言与关联分析（转载）](http://blog.sina.com.cn/s/blog_6aed37fd0101qe27.html)
+
+## Read data & have a glimpse
+
+Read the data from the csv file and assign it to `r` variable.
+
+```{r}
+d <- readr::read_csv("data.csv", locale = readr::locale(encoding = "GB2312"), col_names = FALSE)
+tmp <- purrr::flatten_chr(d)
+tmp <- table(tmp)
+tmp <- sort(tmp, decreasing = TRUE)
+head(data_frame(Item = names(tmp), Count = unname(tmp)), 20)
+plot(tmp)
+```
+
+## Data Analysis
+
+### Data preparing
+
+i.e., convert the character matrix (in fact it's been storaged in a `data_frame` for now) to `transaction-class`, so that we can use `arules` to continue the analysis.
+
+```{r}
+r <- as.data.frame(t(d))
+r <- lapply(r, stringr::str_trim, side = "both") # remove the space of the text
+r <- lapply(r, unique) # ensure each case's desc is unique
+r <- lapply(r, function(x) {
+  x[stringr::str_length(x) == 0] <- NA_character_
+  x
+})
+names(r) <- paste0("Case-", 1:length(r))
+r <- as(r, "transactions")
+```
+
+### Do the sampe analysis as in the _Reference_
+
+```{r, fig.width=12, warning=FALSE, dev='svglite'}
+rules <- apriori(r, parameter = list(support = 0.01, confidence = 0.2))
+
+inspect(sort(rules, by = "support")[1:6]) #按支持度查看前6条规则
+inspect(sort(rules, by = "confidence")[1:6]) #按置信度查看前6条规则
+inspect(sort(rules, by = "confidence")[1:6])
+# sub.rules=subset(rules, subset = rhs %in% "whole milk" &lift > 1.2) #也可以用subset做规则的筛选,取"右手边"含有whole milk且lift大于1.2的规则
+
+itemFrequencyPlot(r, support = 0.05, cex.names = 0.8) #数据画频繁项的图
+
+# plot(rules, shading = "order", control = list(main = "Two-key plot"))#见chart.1
+# plot(rules, method = "grouped")#见chart.2
+# plot(rules, method = "graph")#见chart.3
+```
+
+
