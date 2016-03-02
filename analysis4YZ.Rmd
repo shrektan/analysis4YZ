@@ -1,5 +1,5 @@
 ---
-title: "Apriori Analysis for TCM"
+title: "An Experimental Apriori Analysis"
 author: "Xianying, Tan"
 date: "2016年3月2日"
 output: html_document
@@ -14,7 +14,6 @@ _(You'll not be able to exec the script without installing the following package
 - readr
 - purrr
 - stringr # character manipulation
-- showtext # show Chinese in the plot
 
 ### For data mining:
 - arules
@@ -24,7 +23,6 @@ _(You'll not be able to exec the script without installing the following package
 ## Setting up the environment
 
 ```{r setting, echo=TRUE, message=FALSE, warning=FALSE}
-showtext::showtext.auto()
 library(dplyr)
 library(ggplot2)
 library(arules)
@@ -68,17 +66,21 @@ r <- as(r, "transactions")
 
 ### Do the sampe analysis as in the _Reference_
 
-```{r, fig.width=12, warning=FALSE, dev='svglite'}
-rules <- apriori(r, parameter = list(support = 0.01, confidence = 0.2))
+```{r, fig.width=12, warning=FALSE}
 
+rules <- apriori(r, parameter = list(support = 0.01, confidence = 0.2))
 inspect(sort(rules, by = "support")[1:6]) #按支持度查看前6条规则
 inspect(sort(rules, by = "confidence")[1:6]) #按置信度查看前6条规则
 inspect(sort(rules, by = "confidence")[1:6])
 # sub.rules=subset(rules, subset = rhs %in% "whole milk" &lift > 1.2) #也可以用subset做规则的筛选,取"右手边"含有whole milk且lift大于1.2的规则
 
+par(family = 'STKaiti')
 itemFrequencyPlot(r, support = 0.05, cex.names = 0.8) #数据画频繁项的图
 
-# plot(rules, shading = "order", control = list(main = "Two-key plot"))#见chart.1
+par(family = 'STKaiti')
+plot(rules, shading = "order", control = list(main = "Two-key plot"))#见chart.1
+
+# par(family = 'STKaiti')
 # plot(rules, method = "grouped")#见chart.2
 # plot(rules, method = "graph")#见chart.3
 ```
