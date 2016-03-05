@@ -1,6 +1,6 @@
 ## How to use it
 
-- install the following packages by `install.packages(c("dplyr", "ggplot2", "readr", "purrr", "stringr", "arules", "arulesViz")`
+- install the following packages by `install.packages(c("dplyr", "ggplot2", "readr", "purrr", "stringr", "arules", "arulesViz"))`
 - open your Rstudio
 - create new project -> version control -> git -> URL: https://github.com/shrektan/analysis4YZ.git
 - open the script of __analysis4YZ.Rmd__
